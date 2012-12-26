@@ -15,7 +15,7 @@ void updateFunc(sf::RenderWindow* window) {
 
 	sf::Clock clock;
 
-	float timeMultiplier = 0.0f;
+	float timeMultiplier = 1.0f;
 	sf::Int64 optimalTime = 1000000/UPDATE_RATE;
 	sf::Int64 time;
 
@@ -56,6 +56,6 @@ void drawFunc(sf::RenderWindow* window) {
 		}
 	}
 
-	window->close();
+	//window->close();
 }
 

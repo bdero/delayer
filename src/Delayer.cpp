@@ -13,15 +13,26 @@ Delayer::Delayer() :
 m_pBuffer(new DelayBuffer()),
 m_pRecorder(new DelayRecorder(m_pBuffer)),
 m_pStream(new DelayStream(m_pBuffer)),
-m_pExitButton(new Button("Exit", sf::Vector2i(), sf::Vector2<unsigned int>(150, 50))),
-m_pStartButton(new Button("Start", sf::Vector2i(), sf::Vector2<unsigned int>(150, 50))),
-m_pRecording(false) {
-	if (sf::SoundRecorder::isAvailable() == false) {
+m_pExitButton(new Button("Exit", sf::Vector2i(0, 0), sf::Vector2<unsigned int>(150, 50), true)),
+m_pStartButton(new Button("Start", sf::Vector2i(0, 0), sf::Vector2<unsigned int>(150, 50), true)),
+m_pRecording(false),
+m_pButtonsImage(sf::Image()) {
+	if (!sf::SoundRecorder::isAvailable()) {
 		std::cout << "Audio capture not available!";
 	} else {
 		m_pStream->play();
 		//sf::sleep(sf::milliseconds(2000));
 		//m_pRecorder->start(SAMPLE_COUNT);
+	}
+
+	// Load images
+	if (m_pButtonsImage.loadFromFile("content/image/button/buttons.png")) {
+		sf::Rect<int> rect(0, 0, 150, 200);
+		m_pStartButton->setImage(m_pButtonsImage, rect);
+		rect = sf::Rect<int>(0, 200, 150, 100);
+		m_pExitButton->setImage(m_pButtonsImage, rect);
+	} else {
+		std::cout << "Unable to load image file.";
 	}
 }
 
@@ -43,8 +54,12 @@ bool Delayer::update(sf::RenderWindow& w, float& tm) {
 		m_pExitButton->setPosition(sf::Vector2i(
 				w.getSize().x - m_pExitButton->getSize().x - 10,
 				w.getSize().y - m_pExitButton->getSize().y - 10));
-		if (m_pExitButton->update(w) == 3)
+		if (m_pExitButton->update(w) == 3) {
+			m_pRecorder->stop();
+			// ADDED
+			w.close();
 			return false;
+		}
 
 		m_pStartButton->setPosition(sf::Vector2i(
 				10,
@@ -65,6 +80,9 @@ bool Delayer::update(sf::RenderWindow& w, float& tm) {
 		sf::Event event;
 		while (w.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {
+				m_pRecorder->stop();
+				// ADDED
+				w.close();
 				return false;
 			}
 		}
@@ -74,14 +92,12 @@ bool Delayer::update(sf::RenderWindow& w, float& tm) {
 }
 
 void Delayer::draw(sf::RenderWindow& w) {
-	{
-		sf::Lock lock(m_pMutex);
+	sf::Lock lock(m_pMutex);
 
-		w.clear(sf::Color::Black);
-		m_pExitButton->draw(w);
-		m_pStartButton->draw(w);
-		w.display();
-	}
+	w.clear(sf::Color::Black);
+	m_pExitButton->draw(w);
+	m_pStartButton->draw(w);
+	w.display();
 }
 
 Delayer& Delayer::operator=(Delayer const& assignment) {

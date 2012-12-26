@@ -41,6 +41,7 @@ private:
 	Button* m_pStartButton;
 	sf::Mutex m_pMutex;
 	bool m_pRecording;
+	sf::Image m_pButtonsImage;
 
 };
 

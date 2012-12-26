@@ -19,10 +19,11 @@ int main(int argc, char** argv) {
 	sf::RenderWindow window(sf::VideoMode(WINDOW_BOUNDS), WINDOW_TITLE, sf::Style::Default);
 
 	sf::Thread updateThread(&updateFunc, &window);
-	sf::Thread drawThread(&drawFunc, &window);
+	//sf::Thread drawThread(&drawFunc, &window);
 
 	updateThread.launch();
-	drawThread.launch();
+
+	drawFunc(&window);
 
 	updateThread.wait();
 
